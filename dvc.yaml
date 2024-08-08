@@ -1,0 +1,16 @@
+stages:
+  data_ingestion:
+    cmd: python .\src\data_ingestion.py data/raw/harrypotter.txt
+    deps:
+      - .\src\data_ingestion.py
+      - .\data\raw\harrypotter.txt
+    outs:
+      - .\data\processed
+
+  data_preprocessing:
+    cmd: python .\src\data_preprocessing.py data/processed/documents.pkl 
+    deps:
+      - .\src\data_preprocessing.py
+      - .\data\processed\documents.pkl
+    outs:
+      - .\data\vector_db

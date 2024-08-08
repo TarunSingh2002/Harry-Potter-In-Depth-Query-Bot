@@ -1,0 +1,11 @@
+openai
+langchain
+langchain-openai
+python-dotenv
+langchain_community
+langserve
+sse_starlette
+chromadb
+Flask
+aws-wsgi
+flask-cors

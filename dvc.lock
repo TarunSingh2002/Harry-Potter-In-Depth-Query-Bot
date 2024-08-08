@@ -1,0 +1,36 @@
+schema: '2.0'
+stages:
+  data_ingestion:
+    cmd: python .\src\data_ingestion.py data/raw/harrypotter.txt
+    deps:
+    - path: .\data\raw\harrypotter.txt
+      hash: md5
+      md5: 513a56a065d3177ba0cb017d6c0cae9c
+      size: 6515998
+    - path: .\src\data_ingestion.py
+      hash: md5
+      md5: fcb403a498ecbb2feb78095754addc0f
+      size: 1212
+    outs:
+    - path: .\data\processed
+      hash: md5
+      md5: cf54d4f9fe99db71afef7b5e1eab0e9a.dir
+      size: 7869964
+      nfiles: 1
+  data_preprocessing:
+    cmd: python .\src\data_preprocessing.py data/processed/documents.pkl
+    deps:
+    - path: .\data\processed\documents.pkl
+      hash: md5
+      md5: 4684b82d95f16dfe57614349c16a6af5
+      size: 7869964
+    - path: .\src\data_preprocessing.py
+      hash: md5
+      md5: 114178625e59d7f4488f7cefab391870
+      size: 1192
+    outs:
+    - path: .\data\vector_db
+      hash: md5
+      md5: a6506812e01ca8bd92aa089c7356c40f.dir
+      size: 167298167
+      nfiles: 6
