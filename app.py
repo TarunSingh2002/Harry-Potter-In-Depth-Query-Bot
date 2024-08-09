@@ -1,13 +1,15 @@
-
 import os
 from pathlib import Path
 from dotenv import load_dotenv
 from langchain_openai import ChatOpenAI
+from flask import Flask, render_template
 from langchain_openai import OpenAIEmbeddings
 from langchain.chains import create_retrieval_chain
 from langchain_community.vectorstores import Chroma
 from langchain_core.prompts import ChatPromptTemplate
 from langchain.chains.combine_documents import create_stuff_documents_chain
+
+app = Flask(__name__)
 
 load_dotenv()
 os.environ["OPENAI_API_KEY"]=os.getenv("OPENAI_API_KEY")
@@ -45,5 +47,9 @@ def main():
     response = retrieval_chain.invoke({"input":'harry potter, Hermione Granger and ron mother names ?'})
     print(response['answer'])
 
+@app.route('/')
+def index():
+    return render_template('index.html')
+
 if __name__ == "__main__":
-    main()
+    app.run(debug=True)

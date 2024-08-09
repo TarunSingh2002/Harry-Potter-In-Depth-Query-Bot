@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flask App</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            overflow: hidden;
+            background-color: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .background {
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            background-size: cover;
+            background-position: right top;
+            transition: background-image 1s ease-in-out;
+        }
+
+        .banner, .logo {
+            position: absolute;
+            opacity: 1;
+            transition: opacity 1s ease-in-out;
+        }
+
+        .banner {
+            top: 0;
+            left: 1%;
+        }
+
+        .logo {
+            right: 5%;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .letter {
+            display: none;
+            position: absolute;
+            opacity: 1;
+            transition: opacity 1s ease-in-out;
+        }
+
+        .input-container {
+            text-align: center;
+            color: white;
+            position: relative;
+            z-index: 2;
+            width: 80%;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+        }
+
+        input[type="text"] {
+            padding: 15px;
+            font-size: 1.5rem;
+            margin-top: 20px;
+            width: 100%;
+        }
+
+        input[type="submit"] {
+            padding: 15px 30px;
+            font-size: 1.5rem;
+            margin-top: 20px;
+            cursor: pointer;
+        }
+
+        input[type="submit"]:disabled {
+            background-color: grey;
+            cursor: not-allowed;
+        }
+
+        @media (max-width: 768px) {
+            .background {
+                background-position: right top;
+            }
+            .banner {
+                top: 0;
+                left: 0;
+                width: 10%;
+            }
+            .logo {
+                top: 15%;
+                right: 50%;
+                transform: translate(50%, -50%);
+                width: 35%;
+            }
+            .letter {
+                display: block;
+                bottom: 3%;
+                right: 3%;
+                width: 6%;
+            }
+            .input-container {
+                display: flex;
+                flex-direction: column-reverse;
+                align-items: center;
+            }
+            h1 {
+                order: 3;
+            }
+            input[type="submit"] {
+                order: 1;
+            }
+            input[type="text"] {
+                order: 2;
+            }
+        }
+    </style> 
+</head>
+<body>
+
+<div class="background" id="background"></div>
+<img src="/static/images/banner-desktop/1.svg" class="banner" id="banner" /> 
+<img src="/static/images/logo/1.svg" class="logo" id="logo" />
+<img src="/static/images/letter-mobile/1.svg" class="letter" id="letter" /> 
+
+<div class="input-container">
+    <h1>Question</h1>
+    <form id="question-form" onsubmit="submitForm(event)">
+        <input type="text" id="user-input" placeholder="Type your answer here..." onkeyup="checkInput()">
+        <input type="submit" id="submit-btn" value="Submit" disabled>
+    </form>
+</div>
+<script>
+    let currentIndex = 1;
+    const totalImages = 4;
+    let intervalId;
+
+    function changeImages() {
+        const background = document.getElementById('background');
+        const banner = document.getElementById('banner');
+        const logo = document.getElementById('logo');
+        const letter = document.getElementById('letter');
+
+        // Preload the next set of images
+        const nextBackground = new Image();
+        nextBackground.src = '/static/images/bg-desktop/' + currentIndex + '.svg';
+        const nextBanner = new Image();
+        nextBanner.src = '/static/images/banner-desktop/' + currentIndex + '.svg';
+        const nextLogo = new Image();
+        nextLogo.src = '/static/images/logo/' + currentIndex + '.svg';
+        const nextLetter = new Image(); // Preload the next letter image
+        nextLetter.src = '/static/images/letter-mobile/' + currentIndex + '.svg';
+
+        banner.style.opacity = 0;
+        logo.style.opacity = 0;
+        if (window.innerWidth <= 768) {
+            letter.style.opacity = 0;
+        }
+
+        setTimeout(() => {
+            background.style.backgroundImage = 'url(' + nextBackground.src + ')';
+            banner.src = nextBanner.src;
+            logo.src = nextLogo.src;
+            if (window.innerWidth <= 768) {
+                letter.src = nextLetter.src; // Set the next letter image
+            }
+
+            setTimeout(() => {
+                banner.style.opacity = 1;
+                logo.style.opacity = 1;
+                if (window.innerWidth <= 768) {
+                    letter.style.opacity = 1;
+                }
+            }, 50);
+        }, 950);
+
+        currentIndex = currentIndex % totalImages + 1;
+    }
+
+    function checkInput() {
+        const input = document.getElementById('user-input').value;
+        document.getElementById('submit-btn').disabled = input.trim() === '';
+    }
+
+    function submitForm(event) {
+        event.preventDefault();
+        
+        const input = document.getElementById('user-input').value;
+
+        if (input.trim() !== "") {
+            console.log("Form submitted with input: " + input);
+            document.getElementById('user-input').value = '';
+            document.getElementById('submit-btn').disabled = true;
+        }
+    }
+
+    // Initialize the transitions
+    function startTransitions() {
+        changeImages();
+        intervalId = setInterval(changeImages, 7000);
+    }
+
+    // Preload the first set of images to avoid the black screen at start
+    window.onload = () => {
+        const background = document.getElementById('background');
+        background.style.backgroundImage = 'url(/static/images/bg-desktop/1.svg)';
+
+        startTransitions();
+    };
+</script>
+</body>
+</html>
