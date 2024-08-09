@@ -131,9 +131,10 @@
 <div class="input-container">
     <h1>Question</h1>
     <form id="question-form" onsubmit="submitForm(event)">
-        <input type="text" id="user-input" placeholder="Type your answer here..." onkeyup="checkInput()">
+        <input type="text" id="user-input" placeholder="Type your question here..." onkeyup="checkInput()">
         <input type="submit" id="submit-btn" value="Submit" disabled>
     </form>
+    <div id="output-box" style="color: white; margin-top: 20px;"></div>
 </div>
 <script>
     let currentIndex = 1;
@@ -193,7 +194,19 @@
         const input = document.getElementById('user-input').value;
 
         if (input.trim() !== "") {
-            console.log("Form submitted with input: " + input);
+            fetch("/", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ input_text: input })
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('output-box').innerText = data.answer;
+            })
+            .catch(error => console.error('Error:', error));
+
             document.getElementById('user-input').value = '';
             document.getElementById('submit-btn').disabled = true;
         }
