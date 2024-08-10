@@ -2,9 +2,9 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon"/>
+    <link rel="icon" href="https://harry-potter-static-file.s3.amazonaws.com/static/favicon.ico" type="image/x-icon"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Harry the putter</title>
+    <title>Harry Potter Bot</title>
     <style>
         #loading-screen {
             display: none;
@@ -200,11 +200,10 @@
 </head>
 <body>
 <div class="background" id="background"></div>
-<img src="/static/images/banner-desktop/1.svg" class="banner" id="banner" />
-<img src="/static/images/logo/1.svg" class="logo" id="logo" />
-<img src="/static/images/letter-mobile/1.svg" class="letter" id="letter" />
+<img src="https://harry-potter-static-file.s3.amazonaws.com/static/images/banner-desktop/1.svg" class="banner" id="banner" />
+<img src="https://harry-potter-static-file.s3.amazonaws.com/static/images/logo/1.svg" class="logo" id="logo" />
+<img src="https://harry-potter-static-file.s3.amazonaws.com/static/images/letter-mobile/1.svg" class="letter" id="letter" />
 
-<!-- Loading Screen -->
 <div id="loading-screen" style="display: none;">
     <h2 style="color: blue;">Loading...</h2>
 </div>
@@ -230,13 +229,13 @@
         const logo = document.getElementById('logo');
         const letter = document.getElementById('letter');
         const nextBackground = new Image();
-        nextBackground.src = '/static/images/bg-desktop/' + currentIndex + '.svg';
+        nextBackground.src = 'https://harry-potter-static-file.s3.amazonaws.com/static/images/bg-desktop/' + currentIndex + '.svg';
         const nextBanner = new Image();
-        nextBanner.src = '/static/images/banner-desktop/' + currentIndex + '.svg';
+        nextBanner.src = 'https://harry-potter-static-file.s3.amazonaws.com/static/images/banner-desktop/' + currentIndex + '.svg';
         const nextLogo = new Image();
-        nextLogo.src = '/static/images/logo/' + currentIndex + '.svg';
+        nextLogo.src = 'https://harry-potter-static-file.s3.amazonaws.com/static/images/logo/' + currentIndex + '.svg';
         const nextLetter = new Image();
-        nextLetter.src = '/static/images/letter-mobile/' + currentIndex + '.svg';
+        nextLetter.src = 'https://harry-potter-static-file.s3.amazonaws.com/static/images/letter-mobile/' + currentIndex + '.svg';
 
         banner.style.opacity = 0;
         logo.style.opacity = 0;
@@ -286,7 +285,6 @@
             })
             .then(response => response.json())
             .then(data => {
-                console.log('Data received:', data); // Debugging
                 document.getElementById('loading-screen').style.display = 'none';
                 const outputBox = document.getElementById('output-box');
                 if (data.answer.trim() !== "") {
@@ -313,7 +311,7 @@
 
     window.onload = () => {
         const background = document.getElementById('background');
-        background.style.backgroundImage = 'url(/static/images/bg-desktop/1.svg)';
+        background.style.backgroundImage = 'url(https://harry-potter-static-file.s3.amazonaws.com/static/images/bg-desktop/1.svg)';
         startTransitions();
     };
 </script>

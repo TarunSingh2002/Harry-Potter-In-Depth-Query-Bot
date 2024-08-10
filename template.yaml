@@ -1,0 +1,40 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+
+Resources:
+  HarryPotter:
+    Type: AWS::Serverless::Function
+    Properties:
+      PackageType: Image
+      ImageUri: harrypotterindepthquerybot:latest
+      Timeout: 900
+      MemorySize: 1024
+      Environment:
+        Variables:
+          OPENAI_API_KEY: !Ref OpenAIAPIKey
+          LANGCHAIN_API_KEY: !Ref LangChainAPIKey
+      Events:
+        HarryPotterApi:
+          Type: Api
+          Properties:
+            Path: /
+            Method: ANY
+            RestApiId: !Ref HarryPotterApiGateway
+
+  HarryPotterApiGateway:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+
+Parameters:
+  OpenAIAPIKey:
+    Type: String
+    Description: Your OpenAI API Key
+  LangChainAPIKey:
+    Type: String
+    Description: Your LangChain API Key
+
+Outputs:
+  ApiUrl:
+    Description: "API Gateway URL"
+    Value: !Sub "https://${HarryPotterApiGateway}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
