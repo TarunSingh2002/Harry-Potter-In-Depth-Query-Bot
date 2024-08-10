@@ -110,9 +110,12 @@
             margin-left: 10px;
             flex-shrink: 0;
             width: 30%; /* Adjust width for better alignment */
+            border: 2px solid black;
+            background-color: grey;
         }
 
         #output-box {
+            display: none;
             background-color: grey;
             color: black;
             padding: 15px;
@@ -120,15 +123,16 @@
             max-height: 65vh; 
             overflow-y: auto; 
             margin-top: 10px;
-            display: flex;
             align-items: flex-start; 
             justify-content: flex-start;
             text-align: left;
             font-size: 1.2rem; /* Decreased font size */
             box-sizing: border-box;
+            border: 2px solid black;
         }
 
-        .output-visible {
+        #output-box.output-visible {
+            display: block;
             background-color: white;
             color: black;
             white-space: pre-wrap;
@@ -183,6 +187,8 @@
                 order: 2;
                 margin-left: 0;
                 width: 40%;
+                border: 2px solid black;
+                background-color: grey;
             }
             #user-input {
                 order: 1;
@@ -200,7 +206,7 @@
 
 <!-- Loading Screen -->
 <div id="loading-screen" style="display: none;">
-    <h2 style="color: white;">Loading...</h2>
+    <h2 style="color: blue;">Loading...</h2>
 </div>
 
 <div class="input-container">
@@ -217,6 +223,7 @@
     let currentIndex = 1;
     const totalImages = 4;
     let intervalId;
+
     function changeImages() {
         const background = document.getElementById('background');
         const banner = document.getElementById('banner');
@@ -255,60 +262,58 @@
 
         currentIndex = currentIndex % totalImages + 1;
     }
+
     function checkInput() {
         const input = document.getElementById('user-input').value;
         document.getElementById('submit-btn').disabled = input.trim() === '';
     }
+
     function submitForm(event) {
-    event.preventDefault();
-    const input = document.getElementById('user-input').value;
-    console.log('Submit button clicked');
-    
-    if (input.trim() !== "") {
-        console.log('Input is valid, showing loading screen');
-        // Show loading screen
-        document.getElementById('loading-screen').style.display = 'flex';
-        document.getElementById('output-box').classList.remove('output-visible');
-        document.getElementById('output-box').innerText = '';
+        event.preventDefault();
+        const input = document.getElementById('user-input').value;
 
-        fetch("/", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({ input_text: input })
-        })
-        .then(response => response.json())
-        .then(data => {
-            console.log('Response received, hiding loading screen');
-            // Hide loading screen
-            document.getElementById('loading-screen').style.display = 'none';
+        if (input.trim() !== "") {
+            document.getElementById('loading-screen').style.display = 'flex';
+            document.getElementById('output-box').classList.remove('output-visible');
+            document.getElementById('output-box').innerText = '';
 
-            const outputBox = document.getElementById('output-box');
-            outputBox.innerText = data.answer;
-            outputBox.classList.add('output-visible');
-        })
-        .catch(error => {
-            console.log('Error occurred, hiding loading screen');
-            // Hide loading screen on error
-            document.getElementById('loading-screen').style.display = 'none';
-            console.error('Error:', error);
-        });
+            fetch("/", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ input_text: input })
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Data received:', data); // Debugging
+                document.getElementById('loading-screen').style.display = 'none';
+                const outputBox = document.getElementById('output-box');
+                if (data.answer.trim() !== "") {
+                    outputBox.innerText = data.answer;
+                    outputBox.classList.add('output-visible');
+                } else {
+                    outputBox.classList.remove('output-visible');
+                }
+            })
+            .catch(error => {
+                document.getElementById('loading-screen').style.display = 'none';
+                console.error('Error:', error);
+            });
 
-        document.getElementById('user-input').value = '';
-        document.getElementById('submit-btn').disabled = true;
+            document.getElementById('user-input').value = '';
+            document.getElementById('submit-btn').disabled = true;
+        }
     }
-}
-
 
     function startTransitions() {
         changeImages();
         intervalId = setInterval(changeImages, 7000);
     }
+
     window.onload = () => {
         const background = document.getElementById('background');
         background.style.backgroundImage = 'url(/static/images/bg-desktop/1.svg)';
-
         startTransitions();
     };
 </script>
