@@ -6,6 +6,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Flask App</title>
     <style>
+        #loading-screen {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8); /* Semi-transparent background */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000; /* Ensure it appears above other elements */
+}
+
         body, html {
             margin: 0;
             padding: 0;
@@ -168,6 +182,11 @@
 <img src="/static/images/logo/1.svg" class="logo" id="logo" />
 <img src="/static/images/letter-mobile/1.svg" class="letter" id="letter" />
 
+<!-- Loading Screen -->
+<div id="loading-screen" style="display: none;">
+    <h2 style="color: white;">Loading...</h2>
+</div>
+
 <div class="input-container">
     <h1 id="heading">Harry Potter In Depth Query Bot</h1>
     <form id="question-form" onsubmit="submitForm(event)">
@@ -225,28 +244,47 @@
         document.getElementById('submit-btn').disabled = input.trim() === '';
     }
     function submitForm(event) {
-        event.preventDefault();
-        const input = document.getElementById('user-input').value;
-        if (input.trim() !== "") {
-            fetch("/", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({ input_text: input })
-            })
-            .then(response => response.json())
-            .then(data => {
-                const outputBox = document.getElementById('output-box');
-                outputBox.innerText = data.answer;
-                outputBox.classList.add('output-visible');
-            })
-            .catch(error => console.error('Error:', error));
+    event.preventDefault();
+    const input = document.getElementById('user-input').value;
+    console.log('Submit button clicked');
+    
+    if (input.trim() !== "") {
+        console.log('Input is valid, showing loading screen');
+        // Show loading screen
+        document.getElementById('loading-screen').style.display = 'flex';
+        document.getElementById('output-box').classList.remove('output-visible');
+        document.getElementById('output-box').innerText = '';
 
-            document.getElementById('user-input').value = '';
-            document.getElementById('submit-btn').disabled = true;
-        }
+        fetch("/", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ input_text: input })
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log('Response received, hiding loading screen');
+            // Hide loading screen
+            document.getElementById('loading-screen').style.display = 'none';
+
+            const outputBox = document.getElementById('output-box');
+            outputBox.innerText = data.answer;
+            outputBox.classList.add('output-visible');
+        })
+        .catch(error => {
+            console.log('Error occurred, hiding loading screen');
+            // Hide loading screen on error
+            document.getElementById('loading-screen').style.display = 'none';
+            console.error('Error:', error);
+        });
+
+        document.getElementById('user-input').value = '';
+        document.getElementById('submit-btn').disabled = true;
     }
+}
+
+
     function startTransitions() {
         changeImages();
         intervalId = setInterval(changeImages, 7000);
