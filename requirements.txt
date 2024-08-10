@@ -9,3 +9,4 @@ chromadb
 Flask
 aws-wsgi
 flask-cors
+aws_lambda_wsgi

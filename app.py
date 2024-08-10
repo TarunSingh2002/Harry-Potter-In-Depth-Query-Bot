@@ -9,6 +9,8 @@ from langchain_core.prompts import ChatPromptTemplate
 from flask import Flask, render_template, request, jsonify
 from langchain.chains.combine_documents import create_stuff_documents_chain
 import threading
+from aws_lambda_wsgi import response as wsgi_response
+from werkzeug.middleware.proxy_fix import ProxyFix
 
 app = Flask(__name__)
 
@@ -68,3 +70,7 @@ def index():
 if __name__ == "__main__":
     main()
     app.run(debug=True, threaded=True) 
+
+# AWS Lambda WSGI Handler
+def handler(event, context):
+    return wsgi_response(app, event, context)
