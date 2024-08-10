@@ -53,29 +53,63 @@
         }
 
         .input-container {
-            text-align: center;
             color: white;
-            position: relative;
+            position: absolute;
+            top: 5%;
+            left: calc(1% + 20rem);
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
             z-index: 2;
-            width: 80%;
+            width: calc(100% - 40rem);
         }
 
-        h1 {
-            font-size: 2.5rem;
+        #heading {
+            font-size: 3rem;
+            margin-bottom: 2rem;
         }
 
-        input[type="text"] {
-            padding: 15px;
-            font-size: 1.5rem;
-            margin-top: 20px;
+        .form-group {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            margin-bottom: 20px;
             width: 100%;
         }
 
-        input[type="submit"] {
-            padding: 15px 30px;
+        #user-input {
+            padding: 5px;
             font-size: 1.5rem;
-            margin-top: 20px;
+            flex: 1;
+        }
+
+        #submit-btn {
+            padding: 5px 15px;
+            font-size: 1.5rem;
             cursor: pointer;
+            margin-left: 10px;
+        }
+
+        #output-box {
+            background-color: grey;
+            color: black;
+            padding: 15px;
+            width: 75%; 
+            max-height: 65vh; 
+            overflow-y: auto; 
+            margin-top: 10px;
+            display: flex;
+            align-items: flex-start; 
+            justify-content: flex-start;
+            text-align: left;
+            font-size: 1.5rem;
+            box-sizing: border-box;
+        }
+
+        .output-visible {
+            background-color: white;
+            color: black;
+            white-space: pre-wrap;
         }
 
         input[type="submit"]:disabled {
@@ -108,53 +142,57 @@
                 display: flex;
                 flex-direction: column-reverse;
                 align-items: center;
+                top: auto;
+                left: auto;
+                margin-top: 0;
+                margin-left: 0;
             }
-            h1 {
+            #heading {
                 order: 3;
+                margin-bottom: 0;
             }
-            input[type="submit"] {
+            #submit-btn {
                 order: 1;
+                margin-left: 0;
             }
-            input[type="text"] {
+            #user-input {
                 order: 2;
             }
         }
-    </style> 
+    </style>
 </head>
 <body>
-
 <div class="background" id="background"></div>
-<img src="/static/images/banner-desktop/1.svg" class="banner" id="banner" /> 
+<img src="/static/images/banner-desktop/1.svg" class="banner" id="banner" />
 <img src="/static/images/logo/1.svg" class="logo" id="logo" />
-<img src="/static/images/letter-mobile/1.svg" class="letter" id="letter" /> 
+<img src="/static/images/letter-mobile/1.svg" class="letter" id="letter" />
 
 <div class="input-container">
-    <h1>Question</h1>
+    <h1 id="heading">Harry Potter In Depth Query Bot</h1>
     <form id="question-form" onsubmit="submitForm(event)">
-        <input type="text" id="user-input" placeholder="Type your question here..." onkeyup="checkInput()">
-        <input type="submit" id="submit-btn" value="Submit" disabled>
+        <div class="form-group">
+            <input type="text" id="user-input" placeholder="Type your question here..." onkeyup="checkInput()">
+            <input type="submit" id="submit-btn" value="Submit" disabled>
+        </div>
     </form>
-    <div id="output-box" style="color: white; margin-top: 20px;"></div>
+    <div id="output-box"></div>
 </div>
 <script>
     let currentIndex = 1;
     const totalImages = 4;
     let intervalId;
-
     function changeImages() {
         const background = document.getElementById('background');
         const banner = document.getElementById('banner');
         const logo = document.getElementById('logo');
         const letter = document.getElementById('letter');
-
-        // Preload the next set of images
         const nextBackground = new Image();
         nextBackground.src = '/static/images/bg-desktop/' + currentIndex + '.svg';
         const nextBanner = new Image();
         nextBanner.src = '/static/images/banner-desktop/' + currentIndex + '.svg';
         const nextLogo = new Image();
         nextLogo.src = '/static/images/logo/' + currentIndex + '.svg';
-        const nextLetter = new Image(); // Preload the next letter image
+        const nextLetter = new Image();
         nextLetter.src = '/static/images/letter-mobile/' + currentIndex + '.svg';
 
         banner.style.opacity = 0;
@@ -162,13 +200,12 @@
         if (window.innerWidth <= 768) {
             letter.style.opacity = 0;
         }
-
         setTimeout(() => {
             background.style.backgroundImage = 'url(' + nextBackground.src + ')';
             banner.src = nextBanner.src;
             logo.src = nextLogo.src;
             if (window.innerWidth <= 768) {
-                letter.src = nextLetter.src; // Set the next letter image
+                letter.src = nextLetter.src;
             }
 
             setTimeout(() => {
@@ -182,17 +219,13 @@
 
         currentIndex = currentIndex % totalImages + 1;
     }
-
     function checkInput() {
         const input = document.getElementById('user-input').value;
         document.getElementById('submit-btn').disabled = input.trim() === '';
     }
-
     function submitForm(event) {
         event.preventDefault();
-        
         const input = document.getElementById('user-input').value;
-
         if (input.trim() !== "") {
             fetch("/", {
                 method: "POST",
@@ -203,7 +236,9 @@
             })
             .then(response => response.json())
             .then(data => {
-                document.getElementById('output-box').innerText = data.answer;
+                const outputBox = document.getElementById('output-box');
+                outputBox.innerText = data.answer;
+                outputBox.classList.add('output-visible');
             })
             .catch(error => console.error('Error:', error));
 
@@ -211,14 +246,10 @@
             document.getElementById('submit-btn').disabled = true;
         }
     }
-
-    // Initialize the transitions
     function startTransitions() {
         changeImages();
         intervalId = setInterval(changeImages, 7000);
     }
-
-    // Preload the first set of images to avoid the black screen at start
     window.onload = () => {
         const background = document.getElementById('background');
         background.style.backgroundImage = 'url(/static/images/bg-desktop/1.svg)';
