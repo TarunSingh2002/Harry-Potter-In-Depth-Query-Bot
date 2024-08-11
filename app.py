@@ -1,7 +1,6 @@
 import os
 import threading
 from pathlib import Path
-from dotenv import load_dotenv
 from langchain_openai import ChatOpenAI
 from langchain_openai import OpenAIEmbeddings
 from werkzeug.middleware.proxy_fix import ProxyFix
@@ -14,9 +13,10 @@ from langchain.chains.combine_documents import create_stuff_documents_chain
 
 app = Flask(__name__)
 
-load_dotenv()
-os.environ["OPENAI_API_KEY"] = os.getenv("OPENAI_API_KEY")
-os.environ["LANGCHAIN_API_KEY"] = os.getenv("LANGCHAIN_API_KEY")
+# API keys and project name are now read directly from environment variables
+openai_api_key = os.environ["OPENAI_API_KEY"]
+langchain_api_key = os.environ["LANGCHAIN_API_KEY"]
+langchain_project = os.environ["LANGCHAIN_PROJECT"]
 os.environ["LANGCHAIN_TRACING_V2"] = "true"
 
 retrieval_chain = None
@@ -44,7 +44,12 @@ def initialize_retrieval_chain():
         root_path = current_path.parent
         vector_db_data_path = root_path / 'data' / 'vector_db'
 
-        llm = ChatOpenAI(model="gpt-3.5-turbo")
+        # Debugging logs
+        print("Initializing retrieval chain...")
+        print(f"Vector DB Path: {vector_db_data_path}")
+        print(f"LangChain Project: {langchain_project}")
+
+        llm = ChatOpenAI(model="gpt-3.5-turbo", api_key=openai_api_key, project_name=langchain_project)
 
         prompt = create_prompt()
         db = load_vector_db(persist_directory=vector_db_data_path)
@@ -53,25 +58,38 @@ def initialize_retrieval_chain():
         document_chain = create_stuff_documents_chain(llm, prompt)
 
         retrieval_chain = create_retrieval_chain(retriever, document_chain)
+        print("Retrieval chain initialized successfully.")
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
     initialize_retrieval_chain()
-    
     if request.method == 'POST':
-        user_input = request.json.get('input_text')
+        # Debugging log to check if request received
+        print("POST request received.")
+        try:
+            user_input = request.json.get('input_text')
+            print(f"User Input: {user_input}")  # Log input
 
-        with lock:
-            response = retrieval_chain.invoke({"input": user_input})
-        
-        answer = response['answer']
-        return jsonify({'answer': answer})
+            with lock:
+                response = retrieval_chain.invoke({"input": user_input})
 
+            answer = response['answer']
+            print(f"Generated Answer: {answer}")  # Log output
+
+            return jsonify({'answer': answer})
+
+        except Exception as e:
+            # Log any exception that occurs
+            print(f"Error during request processing: {e}")
+            return jsonify({'error': str(e)}), 500
+
+    # Debugging log to check if GET request is working
+    print("GET request received.")
     return render_template('index.html')
 
-if __name__ == "__main__":
-    initialize_retrieval_chain()
-    app.run(debug=True, threaded=True)
+# if __name__ == "__main__":
+#     initialize_retrieval_chain()
+#     app.run(debug=True, threaded=True)
 
 def handler(event, context):
     initialize_retrieval_chain()

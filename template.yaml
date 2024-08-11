@@ -2,17 +2,18 @@ AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 
 Resources:
-  HarryPotter:
+  HarryPotterFunction:
     Type: AWS::Serverless::Function
     Properties:
       PackageType: Image
-      ImageUri: harrypotterindepthquerybot:latest
+      ImageUri: !Sub "${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/harrypotterindepthquerybot:latest"
       Timeout: 900
-      MemorySize: 1024
+      Role: !GetAtt HarryPotterExecutionRole.Arn
       Environment:
         Variables:
           OPENAI_API_KEY: !Ref OpenAIAPIKey
           LANGCHAIN_API_KEY: !Ref LangChainAPIKey
+          LANGCHAIN_PROJECT: !Ref LangChainProject
       Events:
         HarryPotterApi:
           Type: Api
@@ -26,6 +27,36 @@ Resources:
     Properties:
       StageName: Prod
 
+  HarryPotterExecutionRole:
+    Type: AWS::IAM::Role
+    Properties: 
+      AssumeRolePolicyDocument: 
+        Version: '2012-10-17'
+        Statement: 
+          - Effect: Allow
+            Principal: 
+              Service: 
+                - lambda.amazonaws.com
+            Action: 
+              - sts:AssumeRole
+      Policies:
+        - PolicyName: LambdaExecutionPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: 
+                  - arn:aws:logs:*:*:log-group:/aws/lambda/*
+              - Effect: Allow
+                Action:
+                  - ssm:GetParameter
+                  - secretsmanager:GetSecretValue
+                Resource: "*"
+
 Parameters:
   OpenAIAPIKey:
     Type: String
@@ -33,6 +64,9 @@ Parameters:
   LangChainAPIKey:
     Type: String
     Description: Your LangChain API Key
+  LangChainProject:
+    Type: String
+    Description: Your LangChain Project Name
 
 Outputs:
   ApiUrl:
