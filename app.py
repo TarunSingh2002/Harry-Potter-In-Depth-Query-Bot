@@ -1,16 +1,16 @@
 import os
+import threading
 from pathlib import Path
 from dotenv import load_dotenv
 from langchain_openai import ChatOpenAI
 from langchain_openai import OpenAIEmbeddings
-from langchain.chains import create_retrieval_chain
+from werkzeug.middleware.proxy_fix import ProxyFix
 from langchain_community.vectorstores import Chroma
+from langchain.chains import create_retrieval_chain
+from aws_lambda_wsgi import response as wsgi_response
 from langchain_core.prompts import ChatPromptTemplate
 from flask import Flask, render_template, request, jsonify
 from langchain.chains.combine_documents import create_stuff_documents_chain
-import threading
-from aws_lambda_wsgi import response as wsgi_response
-from werkzeug.middleware.proxy_fix import ProxyFix
 
 app = Flask(__name__)
 
@@ -19,9 +19,8 @@ os.environ["OPENAI_API_KEY"] = os.getenv("OPENAI_API_KEY")
 os.environ["LANGCHAIN_API_KEY"] = os.getenv("LANGCHAIN_API_KEY")
 os.environ["LANGCHAIN_TRACING_V2"] = "true"
 
-# Global variable for retrieval_chain
 retrieval_chain = None
-lock = threading.Lock()  # Add a lock for thread-safe access to shared resources
+lock = threading.Lock()
 
 def load_vector_db(persist_directory: Path) -> Chroma:
     db = Chroma(persist_directory=str(persist_directory), embedding_function=OpenAIEmbeddings())
@@ -38,28 +37,31 @@ def create_prompt():
     """)
     return prompt
 
-def main():
+def initialize_retrieval_chain():
     global retrieval_chain
-    current_path = Path(__file__)
-    root_path = current_path.parent
-    vector_db_data_path = root_path / 'data' / 'vector_db'
+    if retrieval_chain is None:
+        current_path = Path(__file__)
+        root_path = current_path.parent
+        vector_db_data_path = root_path / 'data' / 'vector_db'
 
-    llm = ChatOpenAI(model="gpt-3.5-turbo")
+        llm = ChatOpenAI(model="gpt-3.5-turbo")
 
-    prompt = create_prompt()
-    db = load_vector_db(persist_directory=vector_db_data_path)
-    retriever = db.as_retriever()
+        prompt = create_prompt()
+        db = load_vector_db(persist_directory=vector_db_data_path)
+        retriever = db.as_retriever()
 
-    document_chain = create_stuff_documents_chain(llm, prompt)
+        document_chain = create_stuff_documents_chain(llm, prompt)
 
-    retrieval_chain = create_retrieval_chain(retriever, document_chain)
+        retrieval_chain = create_retrieval_chain(retriever, document_chain)
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
+    initialize_retrieval_chain()
+    
     if request.method == 'POST':
         user_input = request.json.get('input_text')
-        
-        with lock: 
+
+        with lock:
             response = retrieval_chain.invoke({"input": user_input})
         
         answer = response['answer']
@@ -68,9 +70,9 @@ def index():
     return render_template('index.html')
 
 if __name__ == "__main__":
-    main()
-    app.run(debug=True, threaded=True) 
+    initialize_retrieval_chain()
+    app.run(debug=True, threaded=True)
 
-# AWS Lambda WSGI Handler
 def handler(event, context):
+    initialize_retrieval_chain()
     return wsgi_response(app, event, context)
