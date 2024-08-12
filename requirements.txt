@@ -5,7 +5,7 @@ python-dotenv
 langchain_community
 langserve
 sse_starlette
-chromadb
+langchain-chroma
 Flask
 aws-wsgi
 flask-cors

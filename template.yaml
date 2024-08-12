@@ -8,6 +8,7 @@ Resources:
       PackageType: Image
       ImageUri: !Sub "${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/harrypotterindepthquerybot:latest"
       Timeout: 900
+      MemorySize: 1024
       Role: !GetAtt HarryPotterExecutionRole.Arn
       Environment:
         Variables:
@@ -26,6 +27,15 @@ Resources:
     Type: AWS::Serverless::Api
     Properties:
       StageName: Prod
+      Cors:
+        AllowMethods: "'GET,POST,OPTIONS'"
+        AllowHeaders: "'Content-Type,Authorization,X-Amz-Date,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent'"
+        AllowOrigin: "'*'"
+      MethodSettings:
+        - ResourcePath: "/*"
+          HttpMethod: "*"
+          LoggingLevel: INFO
+          DataTraceEnabled: true
 
   HarryPotterExecutionRole:
     Type: AWS::IAM::Role
@@ -49,14 +59,26 @@ Resources:
                   - logs:CreateLogGroup
                   - logs:CreateLogStream
                   - logs:PutLogEvents
-                Resource: 
-                  - arn:aws:logs:*:*:log-group:/aws/lambda/*
+                Resource: arn:aws:logs:*:*:*
+              - Effect: Allow
+                Action:
+                  - s3:GetObject
+                Resource: arn:aws:s3:::harry-potter-static-file/*
+              - Effect: Allow
+                Action:
+                  - ecr:GetDownloadUrlForLayer
+                  - ecr:BatchGetImage
+                  - ecr:BatchCheckLayerAvailability
+                Resource: arn:aws:ecr:${region}:${accountid}:repository/harrypotterindepthquerybot
               - Effect: Allow
                 Action:
                   - ssm:GetParameter
                   - secretsmanager:GetSecretValue
                 Resource: "*"
-
+              - Effect: Allow
+                Action:
+                  - lambda:InvokeFunction
+                Resource: "*"
 Parameters:
   OpenAIAPIKey:
     Type: String

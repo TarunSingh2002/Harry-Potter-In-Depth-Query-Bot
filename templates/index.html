@@ -268,41 +268,49 @@
     }
 
     function submitForm(event) {
-        event.preventDefault();
-        const input = document.getElementById('user-input').value;
+    event.preventDefault();
+    const input = document.getElementById('user-input').value;
 
-        if (input.trim() !== "") {
-            document.getElementById('loading-screen').style.display = 'flex';
-            document.getElementById('output-box').classList.remove('output-visible');
-            document.getElementById('output-box').innerText = '';
+    if (input.trim() !== "") {
+        document.getElementById('loading-screen').style.display = 'flex';
+        document.getElementById('output-box').classList.remove('output-visible');
+        document.getElementById('output-box').innerText = '';
 
-            fetch("/", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({ input_text: input })
-            })
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById('loading-screen').style.display = 'none';
-                const outputBox = document.getElementById('output-box');
-                if (data.answer.trim() !== "") {
-                    outputBox.innerText = data.answer;
-                    outputBox.classList.add('output-visible');
-                } else {
-                    outputBox.classList.remove('output-visible');
-                }
-            })
-            .catch(error => {
-                document.getElementById('loading-screen').style.display = 'none';
-                console.error('Error:', error);
-            });
+        fetch("/", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ input_text: input })
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            document.getElementById('loading-screen').style.display = 'none';
+            const outputBox = document.getElementById('output-box');
+            if (data.answer && data.answer.trim() !== "") {
+                outputBox.innerText = data.answer;
+                outputBox.classList.add('output-visible');
+            } else {
+                outputBox.classList.remove('output-visible');
+            }
+        })
+        .catch(error => {
+            document.getElementById('loading-screen').style.display = 'none';
+            console.error('Error:', error);
+            const outputBox = document.getElementById('output-box');
+            outputBox.innerText = `An error occurred: ${error.message}`;
+            outputBox.classList.add('output-visible');
+        });
 
-            document.getElementById('user-input').value = '';
-            document.getElementById('submit-btn').disabled = true;
-        }
+        document.getElementById('user-input').value = '';
+        document.getElementById('submit-btn').disabled = true;
     }
+}
 
     function startTransitions() {
         changeImages();
