@@ -75,5 +75,4 @@ if __name__ == "__main__":
 
 def handler(event, context):
     initialize_retrieval_chain()
-    event['queryStringParameters'] = event.get('queryStringParameters', {})
     return awsgi.response(app, event, context)
