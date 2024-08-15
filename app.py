@@ -64,7 +64,7 @@ def index():
             answer = response.get('answer', 'Sorry, no answer was found.')
         else:
             answer = 'No input provided. Please enter a question.'
-        return render_template('index.html', answer=answer)
+        return answer 
     return render_template('index.html')
 
 def handler(event, context):
