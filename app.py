@@ -3,6 +3,7 @@ import awsgi
 import threading
 from pathlib import Path
 from flask_cors import CORS
+from dotenv import load_dotenv
 from langchain_chroma import Chroma
 from langchain_openai import ChatOpenAI
 from langchain_openai import OpenAIEmbeddings
@@ -12,11 +13,11 @@ from flask import Flask, render_template, request, jsonify
 from langchain.chains.combine_documents import create_stuff_documents_chain
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, resources={r"/*": {"origins": "*", "methods": ["GET", "POST", "OPTIONS"], "allow_headers": ["Content-Type", "Authorization", "X-Api-Key", "X-Amz-Date", "X-Amz-Security-Token"]}})
 
-openai_api_key = os.environ["OPENAI_API_KEY"]
-langchain_api_key = os.environ["LANGCHAIN_API_KEY"]
-langchain_project = os.environ["LANGCHAIN_PROJECT"]
+load_dotenv()
+os.environ["OPENAI_API_KEY"] = os.getenv("OPENAI_API_KEY")
+os.environ["LANGCHAIN_API_KEY"] = os.getenv("LANGCHAIN_API_KEY")
 os.environ["LANGCHAIN_TRACING_V2"] = "true"
 
 retrieval_chain = None
@@ -54,11 +55,10 @@ def initialize_retrieval_chain():
 
         retrieval_chain = create_retrieval_chain(retriever, document_chain)
 
-@app.route('/', methods=['GET', 'POST'])
+@app.route('/', methods=['GET','POST'])
 def index():
-    initialize_retrieval_chain()
-    
     if request.method == 'POST':
+        initialize_retrieval_chain()
         user_input = request.json.get('input_text')
 
         with lock:
@@ -69,10 +69,9 @@ def index():
 
     return render_template('index.html')
 
-if __name__ == "__main__":
-    initialize_retrieval_chain()
-    app.run(debug=True, threaded=True)
+# if __name__ == "__main__":
+#     initialize_retrieval_chain()
+#     app.run(debug=True, threaded=True)
 
 def handler(event, context):
-    initialize_retrieval_chain()
     return awsgi.response(app, event, context)

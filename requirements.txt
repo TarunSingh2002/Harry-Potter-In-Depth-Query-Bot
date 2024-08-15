@@ -1,12 +1,10 @@
 openai
 langchain
 langchain-openai
-python-dotenv
 langchain_community
 langserve
 sse_starlette
 langchain-chroma
 Flask
-aws-wsgi
 flask-cors
-aws_lambda_wsgi
+aws-wsgi

@@ -2,19 +2,22 @@ AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 
 Resources:
+  HarryPotterApiGateway:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+
   HarryPotterFunction:
     Type: AWS::Serverless::Function
     Properties:
       PackageType: Image
-      ImageUri: !Sub "${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/harrypotterindepthquerybot:latest"
+      ImageUri: ACCountid.dkr.ecr.Region.amazonaws.com/harrypotterindepthquerybot:latest
       Timeout: 900
-      MemorySize: 1024
+      MemorySize: 600
       Role: !GetAtt HarryPotterExecutionRole.Arn
       Environment:
         Variables:
-          OPENAI_API_KEY: !Ref OpenAIAPIKey
-          LANGCHAIN_API_KEY: !Ref LangChainAPIKey
-          LANGCHAIN_PROJECT: !Ref LangChainProject
+          S3_BASE_URL: "https://harry-potter-static-file.s3.amazonaws.com/static"
       Events:
         HarryPotterApi:
           Type: Api
@@ -22,21 +25,7 @@ Resources:
             Path: /
             Method: ANY
             RestApiId: !Ref HarryPotterApiGateway
-
-  HarryPotterApiGateway:
-    Type: AWS::Serverless::Api
-    Properties:
-      StageName: Prod
-      Cors:
-        AllowMethods: "'GET,POST,OPTIONS'"
-        AllowHeaders: "'Content-Type,Authorization,X-Amz-Date,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent'"
-        AllowOrigin: "'*'"
-      MethodSettings:
-        - ResourcePath: "/*"
-          HttpMethod: "*"
-          LoggingLevel: INFO
-          DataTraceEnabled: true
-
+            
   HarryPotterExecutionRole:
     Type: AWS::IAM::Role
     Properties: 
@@ -45,10 +34,8 @@ Resources:
         Statement: 
           - Effect: Allow
             Principal: 
-              Service: 
-                - lambda.amazonaws.com
-            Action: 
-              - sts:AssumeRole
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
       Policies:
         - PolicyName: LambdaExecutionPolicy
           PolicyDocument:
@@ -69,28 +56,8 @@ Resources:
                   - ecr:GetDownloadUrlForLayer
                   - ecr:BatchGetImage
                   - ecr:BatchCheckLayerAvailability
-                Resource: arn:aws:ecr:${region}:${accountid}:repository/harrypotterindepthquerybot
-              - Effect: Allow
-                Action:
-                  - ssm:GetParameter
-                  - secretsmanager:GetSecretValue
                 Resource: "*"
-              - Effect: Allow
-                Action:
-                  - lambda:InvokeFunction
-                Resource: "*"
-Parameters:
-  OpenAIAPIKey:
-    Type: String
-    Description: Your OpenAI API Key
-  LangChainAPIKey:
-    Type: String
-    Description: Your LangChain API Key
-  LangChainProject:
-    Type: String
-    Description: Your LangChain Project Name
-
 Outputs:
   ApiUrl:
     Description: "API Gateway URL"
-    Value: !Sub "https://${HarryPotterApiGateway}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
+    Value: !Sub "https://${HarryPotterApiGateway}.execute-api.Region.amazonaws.com/Prod/"
