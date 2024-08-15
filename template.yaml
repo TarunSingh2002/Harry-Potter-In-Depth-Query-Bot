@@ -6,12 +6,11 @@ Resources:
     Type: AWS::Serverless::Api
     Properties:
       StageName: Prod
-
   HarryPotterFunction:
     Type: AWS::Serverless::Function
     Properties:
       PackageType: Image
-      ImageUri: ACCountid.dkr.ecr.Region.amazonaws.com/harrypotterindepthquerybot:latest
+      ImageUri: Account.dkr.ecr.Region.amazonaws.com/harrypotterindepthquerybot:latest
       Timeout: 900
       MemorySize: 600
       Role: !GetAtt HarryPotterExecutionRole.Arn
@@ -25,7 +24,6 @@ Resources:
             Path: /
             Method: ANY
             RestApiId: !Ref HarryPotterApiGateway
-            
   HarryPotterExecutionRole:
     Type: AWS::IAM::Role
     Properties: 

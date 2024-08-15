@@ -2,7 +2,6 @@ import os
 import awsgi
 import threading
 from pathlib import Path
-from flask_cors import CORS
 from dotenv import load_dotenv
 from langchain_chroma import Chroma
 from langchain_openai import ChatOpenAI
@@ -13,7 +12,6 @@ from flask import Flask, render_template, request, jsonify
 from langchain.chains.combine_documents import create_stuff_documents_chain
 
 app = Flask(__name__)
-CORS(app, resources={r"/*": {"origins": "*", "methods": ["GET", "POST", "OPTIONS"], "allow_headers": ["Content-Type", "Authorization", "X-Api-Key", "X-Amz-Date", "X-Amz-Security-Token"]}})
 
 load_dotenv()
 os.environ["OPENAI_API_KEY"] = os.getenv("OPENAI_API_KEY")
@@ -55,23 +53,23 @@ def initialize_retrieval_chain():
 
         retrieval_chain = create_retrieval_chain(retriever, document_chain)
 
-@app.route('/', methods=['GET','POST'])
+@app.route('/', methods=['GET', 'POST'])
 def index():
     if request.method == 'POST':
         initialize_retrieval_chain()
-        user_input = request.json.get('input_text')
-
-        with lock:
-            response = retrieval_chain.invoke({"input": user_input})
-        
-        answer = response['answer']
-        return jsonify({'answer': answer})
-
+        user_input = request.form.get('input_text')
+        if user_input:
+            with lock:
+                response = retrieval_chain.invoke({"input": user_input})
+            answer = response.get('answer', 'Sorry, no answer was found.')
+        else:
+            answer = 'No input provided. Please enter a question.'
+        return render_template('index.html', answer=answer)
     return render_template('index.html')
+
+def handler(event, context):
+    return awsgi.response(app, event, context)
 
 # if __name__ == "__main__":
 #     initialize_retrieval_chain()
 #     app.run(debug=True, threaded=True)
-
-def handler(event, context):
-    return awsgi.response(app, event, context)

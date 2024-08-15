@@ -325,7 +325,17 @@
 </script>
 </body>
 </html> -->
-<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+<!-- <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -376,9 +386,15 @@
 </head>
 <body>
     <h1>Simple Flask App</h1>
-    <input type="text" id="userInput" placeholder="Type something...">
-    <button id="submitBtn" disabled>Submit</button>
-    <div id="output"></div>
+    <form method="POST" action="/" id="inputForm">
+        <input type="text" id="userInput" name="input_text" placeholder="Type something..." required>
+        <button type="submit" id="submitBtn">Submit</button>
+    </form>
+    <div id="output">
+        {% if answer %}
+            Response: {{ answer }}
+        {% endif %}
+    </div>
 
     <script>
         const userInput = document.getElementById('userInput');
@@ -414,5 +430,39 @@
             });
         });
     </script>
+</body>
+</html> -->
+
+
+
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Question Answering System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="header-container">
+        <h1>Question Answering System</h1>
+    </div>
+    <div class="container" style="max-width: 500px; margin: 0 auto">
+        <form method="POST">
+            <label for="input_text">Enter your question:</label>
+            <textarea id="input_text" name="input_text" rows="4" style="width: 100%"></textarea>
+            <button type="submit" style="margin-top: 10px;">Submit</button>
+        </form>
+        <div class="response-container" style="margin-top: 20px;">
+            {% if answer %}
+                <p><strong>Answer:</strong> {{ answer }}</p>
+            {% endif %}
+        </div>
+    </div>
 </body>
 </html>
