@@ -447,22 +447,57 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Question Answering System</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* Loading screen styles */
+        .loading-screen {
+            display: none; /* Hidden by default */
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7); /* Blackish blur */
+            z-index: 1000;
+            text-align: center;
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+    </style>
 </head>
 <body>
     <div class="header-container">
         <h1>Question Answering System</h1>
     </div>
     <div class="container" style="max-width: 500px; margin: 0 auto">
-        <!-- Target the iframe for form submission -->
-        <form method="POST" target="response_iframe">
+        <form method="POST" target="response_iframe" onsubmit="showLoadingScreen()">
             <label for="input_text">Enter your question:</label>
             <textarea id="input_text" name="input_text" rows="4" style="width: 100%"></textarea>
             <button type="submit" style="margin-top: 10px;">Submit</button>
         </form>
         <div class="response-container" style="margin-top: 20px;">
-            <!-- Create an iframe to capture the response -->
-            <iframe name="response_iframe" id="response_iframe" style="width: 100%; height: 100px; border: none;"></iframe>
+            <iframe name="response_iframe" id="response_iframe" style="width: 100%; height: 100px; border: none;" onload="hideLoadingScreen()"></iframe>
         </div>
     </div>
+
+    <!-- Loading Screen -->
+    <div class="loading-screen" id="loading-screen">
+        Loading...
+    </div>
+
+    <script>
+        // Function to show the loading screen
+        function showLoadingScreen() {
+            document.getElementById('loading-screen').style.display = 'flex';
+        }
+
+        // Function to hide the loading screen
+        function hideLoadingScreen() {
+            document.getElementById('loading-screen').style.display = 'none';
+        }
+    </script>
 </body>
 </html>
