@@ -1,8 +1,9 @@
-<!-- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
-    <link rel="icon" href="https://harry-potter-static-file.s3.amazonaws.com/static/favicon.ico" type="image/x-icon"/>
+    <link rel="icon" href="https://harry-potter-static-file.s3.amazonaws.com/static/favicon.ico" type="image/x-icon" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Harry Potter Bot</title>
     <style>
@@ -13,14 +14,20 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.8); /* Semi-transparent background */
+            background-color: rgba(0, 0, 0, 0.8);
             display: flex;
             justify-content: center;
             align-items: center;
-            z-index: 1000; /* Ensure it appears above other elements */
+            z-index: 1000;
         }
 
-        body, html {
+        #loading-screen h2 {
+            color: darkblue;
+            font-size: 2rem;
+        }
+
+        body,
+        html {
             margin: 0;
             padding: 0;
             height: 100%;
@@ -43,7 +50,8 @@
             transition: background-image 1s ease-in-out;
         }
 
-        .banner, .logo {
+        .banner,
+        .logo {
             position: absolute;
             opacity: 1;
             transition: opacity 1s ease-in-out;
@@ -70,7 +78,7 @@
         .input-container {
             color: white;
             position: absolute;
-            top: 3%; /* Moved slightly upwards */
+            top: 3%;
             left: calc(1% + 20rem);
             display: flex;
             flex-direction: column;
@@ -84,7 +92,7 @@
             margin-bottom: 2rem;
         }
 
-        #question-form{
+        #question-form {
             width: 75%;
         }
 
@@ -98,35 +106,35 @@
 
         #user-input {
             padding: 5px;
-            font-size: 1.2rem; /* Decreased font size */
+            font-size: 1.2rem;
             flex: 1;
-            width: 170%; /* Increased width */
+            width: 170%;
         }
 
         #submit-btn {
             padding: 5px 15px;
-            font-size: 1.2rem; /* Decreased font size */
+            font-size: 1.2rem;
             cursor: pointer;
             margin-left: 10px;
             flex-shrink: 0;
-            width: 30%; /* Adjust width for better alignment */
+            width: 30%;
             border: 2px solid black;
             background-color: grey;
         }
 
         #output-box {
             display: none;
-            background-color: grey;
+            background-color: white;
             color: black;
             padding: 15px;
-            width: 75%; 
-            max-height: 65vh; 
-            overflow-y: auto; 
+            width: 75%;
+            max-height: 65vh;
+            overflow-y: auto;
             margin-top: 10px;
-            align-items: flex-start; 
+            align-items: flex-start;
             justify-content: flex-start;
             text-align: left;
-            font-size: 1.2rem; /* Decreased font size */
+            font-size: 1.2rem;
             box-sizing: border-box;
             border: 2px solid black;
         }
@@ -136,6 +144,15 @@
             background-color: white;
             color: black;
             white-space: pre-wrap;
+            overflow-y: auto;
+        }
+
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background-color: transparent;
+            overflow: hidden;
         }
 
         input[type="submit"]:disabled {
@@ -147,23 +164,27 @@
             .background {
                 background-position: right top;
             }
+
             .banner {
                 top: 0;
                 left: 0;
                 width: 10%;
             }
+
             .logo {
                 top: 15%;
                 right: 50%;
                 transform: translate(50%, -50%);
                 width: 35%;
             }
+
             .letter {
                 display: block;
                 bottom: 3%;
                 right: 3%;
                 width: 6%;
             }
+
             .input-container {
                 display: flex;
                 flex-direction: column;
@@ -175,14 +196,17 @@
                 top: 27%;
                 margin-left: 0;
             }
-            .form-group{
+
+            .form-group {
                 flex-direction: column;
             }
+
             #heading {
                 order: 0;
                 margin-bottom: 10px;
                 font-size: 1.2rem;
             }
+
             #submit-btn {
                 order: 2;
                 margin-left: 0;
@@ -190,6 +214,7 @@
                 border: 2px solid black;
                 background-color: grey;
             }
+
             #user-input {
                 order: 1;
                 width: 100%;
@@ -198,306 +223,112 @@
         }
     </style>
 </head>
+
 <body>
-<div class="background" id="background"></div>
-<img src="https://harry-potter-static-file.s3.amazonaws.com/static/images/banner-desktop/1.svg" class="banner" id="banner" />
-<img src="https://harry-potter-static-file.s3.amazonaws.com/static/images/logo/1.svg" class="logo" id="logo" />
-<img src="https://harry-potter-static-file.s3.amazonaws.com/static/images/letter-mobile/1.svg" class="letter" id="letter" />
-
-<div id="loading-screen" style="display: none;">
-    <h2 style="color: blue;">Loading...</h2>
-</div>
-
-<div class="input-container">
-    <h1 id="heading">Harry Potter In Depth Query Bot</h1>
-    <form id="question-form" onsubmit="submitForm(event)" >
-        <div class="form-group">
-            <input type="text" id="user-input" placeholder="Type your question here..." onkeyup="checkInput()">
-            <input type="submit" id="submit-btn" value="Submit" disabled>
-        </div>
-    </form>
-    <div id="output-box"></div>
-</div>
-<script>
-    let currentIndex = 1;
-    const totalImages = 4;
-    let intervalId;
-
-    function changeImages() {
-        const background = document.getElementById('background');
-        const banner = document.getElementById('banner');
-        const logo = document.getElementById('logo');
-        const letter = document.getElementById('letter');
-        const nextBackground = new Image();
-        nextBackground.src = 'https://harry-potter-static-file.s3.amazonaws.com/static/images/bg-desktop/' + currentIndex + '.svg';
-        const nextBanner = new Image();
-        nextBanner.src = 'https://harry-potter-static-file.s3.amazonaws.com/static/images/banner-desktop/' + currentIndex + '.svg';
-        const nextLogo = new Image();
-        nextLogo.src = 'https://harry-potter-static-file.s3.amazonaws.com/static/images/logo/' + currentIndex + '.svg';
-        const nextLetter = new Image();
-        nextLetter.src = 'https://harry-potter-static-file.s3.amazonaws.com/static/images/letter-mobile/' + currentIndex + '.svg';
-
-        banner.style.opacity = 0;
-        logo.style.opacity = 0;
-        if (window.innerWidth <= 768) {
-            letter.style.opacity = 0;
-        }
-        setTimeout(() => {
-            background.style.backgroundImage = 'url(' + nextBackground.src + ')';
-            banner.src = nextBanner.src;
-            logo.src = nextLogo.src;
-            if (window.innerWidth <= 768) {
-                letter.src = nextLetter.src;
-            }
-
-            setTimeout(() => {
-                banner.style.opacity = 1;
-                logo.style.opacity = 1;
-                if (window.innerWidth <= 768) {
-                    letter.style.opacity = 1;
-                }
-            }, 50);
-        }, 950);
-
-        currentIndex = currentIndex % totalImages + 1;
-    }
-
-    function checkInput() {
-        const input = document.getElementById('user-input').value;
-        document.getElementById('submit-btn').disabled = input.trim() === '';
-    }
-
-    function submitForm(event) {
-    event.preventDefault();
-    const input = document.getElementById('user-input').value;
-
-    if (input.trim() !== "") {
-        document.getElementById('loading-screen').style.display = 'flex';
-        document.getElementById('output-box').classList.remove('output-visible');
-        document.getElementById('output-box').innerText = '';
-
-        fetch("/", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({ input_text: input })
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
-            }
-            return response.json();
-        })
-        .then(data => {
-            document.getElementById('loading-screen').style.display = 'none';
-            const outputBox = document.getElementById('output-box');
-            if (data.answer && data.answer.trim() !== "") {
-                outputBox.innerText = data.answer;
-                outputBox.classList.add('output-visible');
-            } else {
-                outputBox.classList.remove('output-visible');
-            }
-        })
-        .catch(error => {
-            document.getElementById('loading-screen').style.display = 'none';
-            console.error('Error:', error);
-            const outputBox = document.getElementById('output-box');
-            outputBox.innerText = `An error occurred: ${error.message}`;
-            outputBox.classList.add('output-visible');
-        });
-
-        document.getElementById('user-input').value = '';
-        document.getElementById('submit-btn').disabled = true;
-    }
-}
-
-    function startTransitions() {
-        changeImages();
-        intervalId = setInterval(changeImages, 7000);
-    }
-
-    window.onload = () => {
-        const background = document.getElementById('background');
-        background.style.backgroundImage = 'url(https://harry-potter-static-file.s3.amazonaws.com/static/images/bg-desktop/1.svg)';
-        startTransitions();
-    };
-</script>
-</body>
-</html> -->
-
-
-
-
-
-
-
-
-
-
-<!-- <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <link rel="icon" href="https://harry-potter-static-file.s3.amazonaws.com/static/favicon.ico" type="image/x-icon"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simple Flask App UI</title>
-    <style>
-        body {
-            background-color: black;
-            color: white;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            margin: 0;
-            font-family: Arial, sans-serif;
-        }
-
-        input[type="text"] {
-            width: 300px;
-            padding: 10px;
-            margin-bottom: 20px;
-            font-size: 16px;
-        }
-
-        button {
-            padding: 10px 20px;
-            font-size: 16px;
-            cursor: not-allowed;
-            background-color: #555;
-            color: #fff;
-            border: none;
-            border-radius: 5px;
-            transition: background-color 0.3s;
-        }
-
-        button:enabled {
-            cursor: pointer;
-            background-color: #007bff;
-        }
-
-        #output {
-            margin-top: 20px;
-            font-size: 18px;
-        }
-    </style>
-</head>
-<body>
-    <h1>Simple Flask App</h1>
-    <form method="POST" action="/" id="inputForm">
-        <input type="text" id="userInput" name="input_text" placeholder="Type something..." required>
-        <button type="submit" id="submitBtn">Submit</button>
-    </form>
-    <div id="output">
-        {% if answer %}
-            Response: {{ answer }}
-        {% endif %}
+    <div class="background" id="background"></div>
+    <img src="https://harry-potter-static-file.s3.amazonaws.com/static/images/banner-desktop/1.svg" class="banner" id="banner" />
+    <img src="https://harry-potter-static-file.s3.amazonaws.com/static/images/logo/1.svg" class="logo" id="logo" />
+    <img src="https://harry-potter-static-file.s3.amazonaws.com/static/images/letter-mobile/1.svg" class="letter" id="letter" />
+    <div id="loading-screen">
+        <h2>Loading...</h2>
     </div>
 
-    <script>
-        const userInput = document.getElementById('userInput');
-        const submitBtn = document.getElementById('submitBtn');
-        const output = document.getElementById('output');
-
-        userInput.addEventListener('input', function() {
-            if (userInput.value.trim() !== "") {
-                submitBtn.disabled = false;
-                submitBtn.style.cursor = 'pointer';
-            } else {
-                submitBtn.disabled = true;
-                submitBtn.style.cursor = 'not-allowed';
-            }
-        });
-
-        submitBtn.addEventListener('click', function() {
-            const inputText = userInput.value.trim();
-            fetch('/', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ input_text: inputText })
-            })
-            .then(response => response.json())
-            .then(data => {
-                output.textContent = `Response: ${data.answer}`;
-            })
-            .catch(error => {
-                output.textContent = 'An error occurred. Please try again.';
-                console.error('Error:', error);
-            });
-        });
-    </script>
-</body>
-</html> -->
-
-
-
-
-
-
-
-
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Question Answering System</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
-    <style>
-        /* Loading screen styles */
-        .loading-screen {
-            display: none; /* Hidden by default */
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.7); /* Blackish blur */
-            z-index: 1000;
-            text-align: center;
-            color: white;
-            font-size: 24px;
-            font-weight: bold;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-    </style>
-</head>
-<body>
-    <div class="header-container">
-        <h1>Question Answering System</h1>
-    </div>
-    <div class="container" style="max-width: 500px; margin: 0 auto">
-        <form method="POST" target="response_iframe" onsubmit="showLoadingScreen()">
-            <label for="input_text">Enter your question:</label>
-            <textarea id="input_text" name="input_text" rows="4" style="width: 100%"></textarea>
-            <button type="submit" style="margin-top: 10px;">Submit</button>
+    <div class="input-container">
+        <h1 id="heading">Harry Potter In Depth Query Bot</h1>
+        <form id="question-form" method="POST" target="response_iframe" onsubmit="showLoadingScreen()">
+            <div class="form-group">
+                <input type="text" id="user-input" name="input_text" placeholder="Type your question here..." onkeyup="checkInput()">
+                <input type="submit" id="submit-btn" value="Submit" disabled>
+            </div>
         </form>
-        <div class="response-container" style="margin-top: 20px;">
-            <iframe name="response_iframe" id="response_iframe" style="width: 100%; height: 100px; border: none;" onload="hideLoadingScreen()"></iframe>
+        <div id="output-box" class="response-container">
+            <iframe name="response_iframe" id="response_iframe" onload="adjustOutputBox()"></iframe>
         </div>
     </div>
 
-    <!-- Loading Screen -->
-    <div class="loading-screen" id="loading-screen">
-        Loading...
-    </div>
-
     <script>
-        // Function to show the loading screen
+        let currentIndex = 1;
+        const totalImages = 4;
+        let intervalId;
+
+        function changeImages() {
+            const background = document.getElementById('background');
+            const banner = document.getElementById('banner');
+            const logo = document.getElementById('logo');
+            const letter = document.getElementById('letter');
+            const nextBackground = new Image();
+            nextBackground.src = 'https://harry-potter-static-file.s3.amazonaws.com/static/images/bg-desktop/' + currentIndex + '.svg';
+            const nextBanner = new Image();
+            nextBanner.src = 'https://harry-potter-static-file.s3.amazonaws.com/static/images/banner-desktop/' + currentIndex + '.svg';
+            const nextLogo = new Image();
+            nextLogo.src = 'https://harry-potter-static-file.s3.amazonaws.com/static/images/logo/' + currentIndex + '.svg';
+            const nextLetter = new Image();
+            nextLetter.src = 'https://harry-potter-static-file.s3.amazonaws.com/static/images/letter-mobile/' + currentIndex + '.svg';
+
+            banner.style.opacity = 0;
+            logo.style.opacity = 0;
+            if (window.innerWidth <= 768) {
+                letter.style.opacity = 0;
+            }
+            setTimeout(() => {
+                background.style.backgroundImage = 'url(' + nextBackground.src + ')';
+                banner.src = nextBanner.src;
+                logo.src = nextLogo.src;
+                if (window.innerWidth <= 768) {
+                    letter.src = nextLetter.src;
+                }
+
+                setTimeout(() => {
+                    banner.style.opacity = 1;
+                    logo.style.opacity = 1;
+                    if (window.innerWidth <= 768) {
+                        letter.style.opacity = 1;
+                    }
+                }, 50);
+            }, 950);
+
+            currentIndex = currentIndex % totalImages + 1;
+        }
+
+        function checkInput() {
+            const input = document.getElementById('user-input').value;
+            document.getElementById('submit-btn').disabled = input.trim() === '';
+        }
+
         function showLoadingScreen() {
             document.getElementById('loading-screen').style.display = 'flex';
         }
 
-        // Function to hide the loading screen
         function hideLoadingScreen() {
             document.getElementById('loading-screen').style.display = 'none';
         }
+
+        function adjustOutputBox() {
+            const iframe = document.getElementById('response_iframe');
+            const outputBox = document.getElementById('output-box');
+            const content = iframe.contentWindow.document.body.innerHTML.trim();
+
+            if (content) {
+                outputBox.classList.add('output-visible');
+                const newHeight = Math.min(iframe.contentWindow.document.body.scrollHeight, window.innerHeight - 200);
+                iframe.style.height = `${newHeight}px`;
+            } else {
+                outputBox.classList.remove('output-visible');
+            }
+
+            hideLoadingScreen();
+        }
+
+        function startTransitions() {
+            changeImages();
+            intervalId = setInterval(changeImages, 7000);
+        }
+
+        window.onload = () => {
+            const background = document.getElementById('background');
+            background.style.backgroundImage = 'url(https://harry-potter-static-file.s3.amazonaws.com/static/images/bg-desktop/1.svg)';
+            startTransitions();
+        };
     </script>
 </body>
 </html>

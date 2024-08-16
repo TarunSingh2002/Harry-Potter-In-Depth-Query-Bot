@@ -70,6 +70,6 @@ def index():
 def handler(event, context):
     return awsgi.response(app, event, context)
 
-# if __name__ == "__main__":
-#     initialize_retrieval_chain()
-#     app.run(debug=True, threaded=True)
+if __name__ == "__main__":
+    initialize_retrieval_chain()
+    app.run(debug=True, threaded=True)
