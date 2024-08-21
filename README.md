@@ -1,6 +1,8 @@
 # Harry Potter In Depth Query Bot
 
-The Harry Potter In-Depth Query Bot is a AI-powered Query bot that allows users to explore the magical world of Harry Potter by asking in-depth questions based on the full text of all seven Harry Potter books. By leveraging the power of Retrieval-Augmented Generation (RAG), the bot retrieves relevant text chunks and generates contextually accurate responses using the GPT-3.5-turbo model. The project is containerized with Docker and deployed on AWS Lambda and API Gateway, ensuring scalability and serverless architecture.
+**[Check out the live project here!](https://lp0b66aa4h.execute-api.us-east-1.amazonaws.com/Prod/)**
+
+Welcome to the Harry Potter Query Bot! This project is a powerful LLM-powered RAG application designed to answer any query related to the Harry Potter series.
 
 <table border="2" style="width:100%; border-collapse: collapse;">
   <tr>
@@ -11,8 +13,6 @@ The Harry Potter In-Depth Query Bot is a AI-powered Query bot that allows users 
   </tr>
 </table>
 
-**[Check out the live project here!](https://lp0b66aa4h.execute-api.us-east-1.amazonaws.com/Prod/)**
-
 ## Table of Contents
 
 1. [Project Overview](#project-overview)
@@ -22,17 +22,19 @@ The Harry Potter In-Depth Query Bot is a AI-powered Query bot that allows users 
 5. [Usage](#usage)
 6. [Deployment](#deployment)
 7. [License](#license)
+8. [Acknowledgments](#acknowledgments)
 
 ## Project Overview
 
-This project uses advanced NLP techniques to break down the complete text of the seven Harry Potter books into manageable chunks, storing them as a vector database. The system utilizes Chroma for vectorization and OpenAI’s embeddings to create a searchable database. When a query is made, relevant text segments are retrieved, and the GPT-3.5-turbo model is employed to generate a human-like response, simulating an in-depth discussion of the Harry Potter series.
+The Harry Potter In-Depth Query Bot is a powerful application that combines Large Language Models (LLMs) with Retrieval-Augmented Generation (RAG) to deliver accurate answers to queries about the Harry Potter series. Utilizing LangChain for seamless integration, the bot employs a Chroma vector database built from the books' text and is accessible via a user-friendly Flask interface. The entire project is containerized with Docker and deployed on AWS Lambda and API Gateway for scalable, serverless execution.
 
 ## Features
 
-- **Data Ingestion:** The entire Harry Potter series is ingested as text files. These texts are then chunked into smaller, manageable pieces and saved as a pickle file in the data/processed folder.
-- **Data Preprocessing:** The text chunks are vectorized using Chroma and OpenAIEmbeddings, forming the backbone of the search functionality.
-- **Web Interface:** A user-friendly Flask web interface allows users to interact with the bot and ask questions.
-- **Dockerized:** The project is fully containerized using Docker, making it easy to deploy across different environments.
+- **LLM (GPT-4o-mini model):** The core model that understands and generates responses to user queries, specifically tuned for the Harry Potter series.
+- **RAG (Retrieval-Augmented Generation):** Enhances the LLM's capabilities by retrieving relevant information from a vector database, ensuring that the answers are both accurate and contextually aligned with the source material.
+- **LangChain:** Serves as the framework that integrates the LLM, RAG mechanism, and vector database, coordinating their interaction to provide seamless query responses.
+- **Vector Database (Chroma with ChatGPT embeddings):** Stores embeddings from all seven Harry Potter books, enabling efficient retrieval of the most relevant text to enrich the LLM’s responses.
+- **Dockerized:** Containerizes the entire application, making it easy to deploy across various environments with consistent behavior.
 - **AWS Deployment:** The application is deployed on AWS Lambda and API Gateway, providing a scalable, serverless architecture.
 
 ## Project Structure
@@ -129,3 +131,7 @@ To get a copy of the project up and running on your local machine, follow these 
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](https://github.com/TarunSingh2002/Harry-Potter-In-Depth-Query-Bot/blob/main/LICENSE.txt) file for details.
+
+## Acknowledgments
+
+This project would not have been possible without the works of **J.K. Rowling** and her creation of the Harry Potter series. The text from the seven books serves as the foundation for the vector database used in this application. Special thanks to the entire **Harry Potter fandom** for keeping the magic alive and inspiring projects like this one.
