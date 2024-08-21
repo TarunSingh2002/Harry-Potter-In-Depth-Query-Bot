@@ -8,7 +8,7 @@ from langchain_openai import ChatOpenAI
 from langchain_openai import OpenAIEmbeddings
 from langchain.chains import create_retrieval_chain
 from langchain_core.prompts import ChatPromptTemplate
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, render_template_string
 from langchain.chains.combine_documents import create_stuff_documents_chain
 
 app = Flask(__name__)
@@ -27,12 +27,18 @@ def load_vector_db(persist_directory: Path) -> Chroma:
 
 def create_prompt():
     prompt = ChatPromptTemplate.from_template("""
-    Answer the following questions based only on the provided context.
-    Think step by step before providing a detailed answer.
+    You are a Harry Potter expert with deep knowledge of all seven books.
+    Your task is to answer the following questions based only on the provided context.
+    Carefully consider all the information, and provide a concise and accurate answer.
+    Format the output in proper HTML.Avoid using markdown.
+    Below are multiple pieces of context that might be relevant:                                         
     <context>
     {context}
     </context>
-    Question: {input}
+    Question: 
+    <question>                                         
+    {input}
+    </question>                                        
     """)
     return prompt
 
@@ -43,11 +49,13 @@ def initialize_retrieval_chain():
         root_path = current_path.parent
         vector_db_data_path = root_path / 'data' / 'vector_db'
 
-        llm = ChatOpenAI(model="gpt-3.5-turbo")
+        llm = ChatOpenAI(model="gpt-4o-mini")
 
         prompt = create_prompt()
         db = load_vector_db(persist_directory=vector_db_data_path)
         retriever = db.as_retriever()
+
+        retriever.search_kwargs['k'] = 5
 
         document_chain = create_stuff_documents_chain(llm, prompt)
 
@@ -64,7 +72,7 @@ def index():
             answer = response.get('answer', 'Sorry, no answer was found.')
         else:
             answer = 'No input provided. Please enter a question.'
-        return answer 
+        return render_template_string('<div>{{ answer | safe }}</div>', answer=answer) 
     return render_template('index.html')
 
 def handler(event, context):
