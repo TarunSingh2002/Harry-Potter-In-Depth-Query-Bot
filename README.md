@@ -2,7 +2,7 @@
 
 **[Check out the live project here!](https://lp0b66aa4h.execute-api.us-east-1.amazonaws.com/Prod/)**
 
-Welcome to the Harry Potter Query Bot! This project is a powerful LLM-powered RAG application designed to answer any query related to the Harry Potter series.
+Welcome to the Harry Potter Query Bot! This project is a LLM-powered RAG application designed to answer any query related to the Harry Potter series.
 
 <table border="2" style="width:100%; border-collapse: collapse;">
   <tr>
