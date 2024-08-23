@@ -401,7 +401,7 @@
         }
 
         function adjustOutputBox() {
-            /*const iframe = document.getElementById('response_iframe');
+            const iframe = document.getElementById('response_iframe');
             const outputBox = document.getElementById('output-box');
             const content = iframe.contentWindow.document.body.innerHTML.trim();
 
@@ -413,16 +413,16 @@
                 outputBox.classList.remove('output-visible');
             }
 
-            hideLoadingScreen();*/
-            const outputBox = document.getElementById('output-box');
-            const contentHeight = outputBox.scrollHeight;
-            const maxHeight = window.innerHeight * 0.97 - 10; 
-            if (contentHeight < maxHeight) {
-                outputBox.style.height = contentHeight + 'px';
-            } else {
-                outputBox.style.height = maxHeight + 'px';
-            }
-            outputBox.classList.add('output-visible');
+            hideLoadingScreen();
+            // const outputBox = document.getElementById('output-box');
+            // const contentHeight = outputBox.scrollHeight;
+            // const maxHeight = window.innerHeight * 0.97 - 10; 
+            // if (contentHeight < maxHeight) {
+            //     outputBox.style.height = contentHeight + 'px';
+            // } else {
+            //     outputBox.style.height = maxHeight + 'px';
+            // }
+            // outputBox.classList.add('output-visible');
         }
 
         function startTransitions() {
