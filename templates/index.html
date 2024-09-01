@@ -1,439 +1,155 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
-    <link rel="icon" href="https://harry-potter-static-file.s3.amazonaws.com/static/favicon.ico" type="image/x-icon" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Harry Potter Bot</title>
+    <link rel="icon" href="https://harry-potter-static-file.s3.amazonaws.com/static/favicon.ico" type="image/x-icon" />
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        #loading-screen {
+        body {
+            background-color: #0E1117;
+            color: #ffffff;
+        }
+
+        .form-control {
+            background-color: #222933;
+            color: #ffffff;
+            border: none;
+            border-radius: 10px;
+            width: 80%;
+            padding: 5px 15px;
+            transition: border 0.3s, background-color 0.3s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border: 2px solid #f63366;
+            background-color: #222933;
+            box-shadow: none;
+            color: #ffffff;
+        }
+
+        .btn-primary {
+            background-color: transparent !important;
+            border: 1px solid #a3a8b4;
+            border-radius: 10px;
+            color: #a3a8b4;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover,
+        .btn-primary:focus {
+            background-color: transparent;
+            border-color: #f63366;
+            color: #f63366;
+            box-shadow: none;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: #333;
+            color: #fff;
+            padding: 15px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+            border: 1px solid #f63366;
+            z-index: 1000;
             display: none;
+        }
+
+        h1 {
+            margin-bottom: 60px;
+            font-weight: 900;
+        }
+
+        @media (max-width: 426px) {
+            h1 {
+                margin-bottom: 30px;
+            }
+        }
+
+        #loading-overlay {
+            display: none; 
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.8);
-            display: flex;
+            background-color: rgba(0, 0, 0, 0.7); 
+            z-index: 2000; 
+            align-items: center;
             justify-content: center;
-            align-items: center;
-            z-index: 1000;
         }
 
-        #loading-screen h2 {
-            color: darkblue;
-            font-size: 2rem;
+        .spinner-border {
+            width: 3rem;
+            height: 3rem;
+            border-width: 0.4rem;
+            border-color: #f63366;
+            border-right-color: transparent;
         }
 
-        body,
-        html {
-            margin: 0;
-            padding: 0;
-            height: 100%;
-            overflow: hidden;
-            background-color: #000;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-        }
-
-        .background {
-            position: absolute;
-            top: 0;
-            right: 0;
-            bottom: 0;
-            left: 0;
-            background-size: cover;
-            background-position: right top;
-            transition: background-image 1s ease-in-out;
-        }
-
-        .banner,
-        .logo {
-            position: absolute;
-            opacity: 1;
-            transition: opacity 1s ease-in-out;
-        }
-
-        .banner {
-            top: 0;
-            left: 0%;
-        }
-
-        .logo {
-            right: 5%;
-            top: 50%;
-            transform: translateY(-50%);
-        }
-
-        .letter {
+        #output_text {
             display: none;
-            position: absolute;
-            opacity: 1;
-            transition: opacity 1s ease-in-out;
-        }
-
-        .input-container {
-            color: white;
-            position: absolute;
-            top: 3%;
-            left: calc(1% + 20rem);
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-            z-index: 2;
-            width: calc(100% - 40rem);
-        }
-
-        #heading {
-            font-size: 3rem;
-            margin-bottom: 2rem;
-        }
-
-        #question-form {
-            width: 75%;
-        }
-
-        .form-group {
-            display: flex;
-            flex-direction: row;
-            align-items: center;
-            margin-bottom: 20px;
-            width: 100%;
-        }
-
-        #user-input {
-            padding: 5px;
-            font-size: 1.2rem;
-            flex: 1;
-            width: 170%;
-        }
-
-        #submit-btn {
-            padding: 5px 15px;
-            font-size: 1.2rem;
-            cursor: pointer;
-            margin-left: 10px;
-            flex-shrink: 0;
-            width: 30%;
-            border: 2px solid black;
-            background-color: grey;
-        }
-
-        #output-box {
-            display: none;
-            background-color: white;
-            color: black;
-            padding: 0;
-            width: 75%;
-            max-height: 65vh;
-            overflow-y: auto;
-            margin-top: 10px;
-            align-items: flex-start;
-            justify-content: flex-start;
-            text-align: left;
-            font-size: 1.2rem;
-            box-sizing: border-box;
-            border: 2px solid black;
-        }
-
-        #output-box.output-visible {
-            display: block;
-            background-color: white;
-            color: black;
-            overflow-y: auto;
-            padding: 0;
-        }
-
-        iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
-            background-color: transparent;
-            overflow: hidden;
-            padding: 0; /* Ensure iframe has no padding */
-            margin: 0; /* Ensure iframe has no margin */
-
-        }
-
-        input[type="submit"]:disabled {
-            background-color: grey;
-            cursor: not-allowed;
-        }
-
-        iframe::before, iframe::after {
-            content: "";
-            display: block;
-            height: 0;
-        }
-
-        iframe body {
-                margin: 0; /* Ensure iframe content has no margin */
-                padding: 0; /* Ensure iframe content has no padding */
-            }
-
-        @media (max-width: 426px) {
-            .background {
-                background-position: right top;
-            }
-
-            .banner {
-                top: 0;
-                left: 0;
-                width: 10%;
-            }
-
-            .logo {
-                top: 15%;
-                right: 50%;
-                transform: translate(50%, -50%);
-                width: 35%;
-            }
-
-            .letter {
-                display: block;
-                bottom: 3%;
-                right: 3%;
-                width: 6%;
-            }
-
-            .input-container {
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                top: auto;
-                left: auto;
-                width: 100%;
-                margin-top: 0;
-                top: 30%;
-                margin-left: 0;
-            }
-
-            .form-group {
-                flex-direction: column;
-            }
-
-            #heading {
-                order: 0;
-                margin-bottom: 10px;
-                font-size: 1.2rem;
-            }
-
-            #submit-btn {
-                order: 2;
-                margin-left: 0;
-                margin-top: 5px;
-                width: 40%;
-                border: 2px solid black;
-                background-color: grey;
-            }
-
-            #user-input {
-                order: 1;
-                width: 100%;
-                margin-bottom: 5px;
-            }
-        }
-        @media (max-width: 769px) and (min-width: 426px) {
-            .background {
-                background-position: right top;
-            }
-
-            .banner {
-                top: 0;
-                left: 0;
-                width: 7%;
-            }
-
-            .logo {
-                top: 15%;
-                right: 50%;
-                transform: translate(50%, -50%);
-                width: 23%;
-                margin-top: 2%;
-            }
-
-            .letter {
-                display: block;
-                bottom: 3%;
-                right: 3%;
-                width: 3%;
-            }
-
-            .input-container {
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                top: auto;
-                left: auto;
-                width: 100%;
-                margin-top: 0;
-                top: 34%;
-                margin-left: 0;
-            }
-
-            .form-group {
-                flex-direction: column;
-            }
-
-            #heading {
-                order: 0;
-                margin-bottom: 10px;
-                font-size: 1.2rem;
-            }
-
-            #submit-btn {
-                order: 2;
-                margin-left: 0;
-                width: 40%;
-                border: 2px solid black;
-                background-color: grey;
-            }
-
-            #user-input {
-                order: 1;
-                width: 100%;
-                margin-bottom: 5px;
-            }
-        }
-        @media (max-width: 1025px) and (min-width: 769px) {
-            .logo {
-                width: 25%;
-            }
-            .banner{
-                width: 10%;
-            }
-            .input-container {
-                left: calc(1% + 10rem);
-                width: calc(100% - 23rem);
-            }
-            #heading {
-                font-size: 2.5rem;
-                margin-bottom: 2rem;
-            }
-            #submit-btn { 
-                width: 20%;
-            }
+            background-color: #222933;
+            color: #ffffff;
+            border: 1px solid #444;
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+            max-height: 400px;
+            overflow: auto;
+            transition: max-height 0.3s ease;
         }
     </style>
 </head>
-
-<body>
-    <div class="background" id="background"></div>
-    <img src="https://harry-potter-static-file.s3.amazonaws.com/static/images/banner-desktop/1.svg" class="banner" id="banner" />
-    <img src="https://harry-potter-static-file.s3.amazonaws.com/static/images/logo/1.svg" class="logo" id="logo" />
-    <img src="https://harry-potter-static-file.s3.amazonaws.com/static/images/letter-mobile/1.svg" class="letter" id="letter" />
-    <div id="loading-screen">
-        <h2>Loading...</h2>
-    </div>
-
-    <div class="input-container">
-        <h1 id="heading">Harry Potter In Depth Query Bot</h1>
-        <form id="question-form" method="POST" target="response_iframe" onsubmit="showLoadingScreen()">
+<body onload="hideLoadingSpinner()">
+    <div class="container mt-5">
+        <h1 class="text-center">Harry Potter In Depth Query Bot 🪄</h1>
+        <form id="query-form" method="post" onsubmit="showLoadingSpinner()">
             <div class="form-group">
-                <input type="text" id="user-input" name="input_text" placeholder="Type your question here..." onkeyup="checkInput()">
-                <input type="submit" id="submit-btn" value="Submit" disabled>
+                <label for="input_text">Enter Your Query:</label>
+                <input type="text" id="input_text" name="input_text" class="form-control" required>
             </div>
+            <button type="submit" class="btn btn-primary">Submit</button>
         </form>
-        <div id="output-box" class="response-container">
-            <iframe name="response_iframe" id="response_iframe" onload="adjustOutputBox()"></iframe>
+
+        <!-- Output Box for HTML Content -->
+        <div id="output_text">
+            {% if answer %}
+                {{ answer | safe }}
+            {% endif %}
         </div>
     </div>
 
+    <!-- Loading Screen -->
+    <div id="loading-overlay">
+        <div id="loading-spinner" class="text-center">
+            <div class="spinner-border" role="status">
+                <span class="sr-only">Loading...</span>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script>
-        let currentIndex = 1;
-        const totalImages = 4;
-        let intervalId;
+        function showLoadingSpinner() {
+            document.getElementById('loading-overlay').style.display = 'flex';
+        }
 
-        function changeImages() {
-            const background = document.getElementById('background');
-            const banner = document.getElementById('banner');
-            const logo = document.getElementById('logo');
-            const letter = document.getElementById('letter');
-            const nextBackground = new Image();
-            nextBackground.src = 'https://harry-potter-static-file.s3.amazonaws.com/static/images/bg-desktop/' + currentIndex + '.svg';
-            const nextBanner = new Image();
-            nextBanner.src = 'https://harry-potter-static-file.s3.amazonaws.com/static/images/banner-desktop/' + currentIndex + '.svg';
-            const nextLogo = new Image();
-            nextLogo.src = 'https://harry-potter-static-file.s3.amazonaws.com/static/images/logo/' + currentIndex + '.svg';
-            const nextLetter = new Image();
-            nextLetter.src = 'https://harry-potter-static-file.s3.amazonaws.com/static/images/letter-mobile/' + currentIndex + '.svg';
-
-            banner.style.opacity = 0;
-            logo.style.opacity = 0;
-            if (window.innerWidth <= 768) {
-                letter.style.opacity = 0;
+        function hideLoadingSpinner() {
+            document.getElementById('loading-overlay').style.display = 'none';
+            // Show the output box if it contains content
+            const outputText = document.getElementById('output_text');
+            if (outputText.innerHTML.trim()) {
+                outputText.style.display = 'block';
             }
-            setTimeout(() => {
-                background.style.backgroundImage = 'url(' + nextBackground.src + ')';
-                banner.src = nextBanner.src;
-                logo.src = nextLogo.src;
-                if (window.innerWidth <= 768) {
-                    letter.src = nextLetter.src;
-                }
-
-                setTimeout(() => {
-                    banner.style.opacity = 1;
-                    logo.style.opacity = 1;
-                    if (window.innerWidth <= 768) {
-                        letter.style.opacity = 1;
-                    }
-                }, 50);
-            }, 950);
-
-            currentIndex = currentIndex % totalImages + 1;
         }
-
-        function checkInput() {
-            const input = document.getElementById('user-input').value;
-            document.getElementById('submit-btn').disabled = input.trim() === '';
-        }
-
-        function showLoadingScreen() {
-            document.getElementById('loading-screen').style.display = 'flex';
-        }
-
-        function hideLoadingScreen() {
-            document.getElementById('loading-screen').style.display = 'none';
-        }
-
-        function adjustOutputBox() {
-            const iframe = document.getElementById('response_iframe');
-            const outputBox = document.getElementById('output-box');
-            const content = iframe.contentWindow.document.body.innerHTML.trim();
-
-            if (content) {
-                outputBox.classList.add('output-visible');
-                const newHeight = Math.min(iframe.contentWindow.document.body.scrollHeight, window.innerHeight - 200);
-                iframe.style.height = `${newHeight}px`;
-            } else {
-                outputBox.classList.remove('output-visible');
-            }
-
-            hideLoadingScreen();
-            // const outputBox = document.getElementById('output-box');
-            // const contentHeight = outputBox.scrollHeight;
-            // const maxHeight = window.innerHeight * 0.97 - 10; 
-            // if (contentHeight < maxHeight) {
-            //     outputBox.style.height = contentHeight + 'px';
-            // } else {
-            //     outputBox.style.height = maxHeight + 'px';
-            // }
-            // outputBox.classList.add('output-visible');
-        }
-
-        function startTransitions() {
-            changeImages();
-            intervalId = setInterval(changeImages, 7000);
-        }
-
-        window.onload = () => {
-            const background = document.getElementById('background');
-            background.style.backgroundImage = 'url(https://harry-potter-static-file.s3.amazonaws.com/static/images/bg-desktop/1.svg)';
-            startTransitions();
-        };
     </script>
 </body>
 </html>

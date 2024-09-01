@@ -63,6 +63,7 @@ def initialize_retrieval_chain():
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
+    answer = ''
     if request.method == 'POST':
         initialize_retrieval_chain()
         user_input = request.form.get('input_text')
@@ -72,12 +73,11 @@ def index():
             answer = response.get('answer', 'Sorry, no answer was found.')
         else:
             answer = 'No input provided. Please enter a question.'
-        return render_template_string('<div>{{ answer | safe }}</div>', answer=answer) 
-    return render_template('index.html')
+    return render_template('index.html', answer=answer)
 
 def handler(event, context):
     return awsgi.response(app, event, context)
 
-if __name__ == "__main__":
-    initialize_retrieval_chain()
-    app.run(debug=True, threaded=True)
+# if __name__ == "__main__":
+#     initialize_retrieval_chain()
+#     app.run(debug=True, threaded=True)
