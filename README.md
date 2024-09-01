@@ -1,15 +1,12 @@
 # Harry Potter In Depth Query Bot
 
-**[Check out the live project here!](https://lp0b66aa4h.execute-api.us-east-1.amazonaws.com/Prod/)**
+**[Check out the live project here!](https://glmhyiev9c.execute-api.us-east-1.amazonaws.com/Prod/)**
 
 Welcome to the Harry Potter Query Bot! This project is a LLM-powered RAG application designed to answer any query related to the Harry Potter series.
 
 <table border="2" style="width:100%; border-collapse: collapse;">
   <tr>
-    <td><img src="https://github.com/user-attachments/assets/6deccd80-3de7-470a-95ae-ba19b910dd95" alt="Project Image 1" style="width:100%;"></td>
-  </tr>
-  <tr>
-    <td><img src="https://github.com/user-attachments/assets/74a78ed2-5c62-4e27-b5c3-91c7bde856a3" alt="Project Image 2" style="width:100%;"></td>
+    <td><img src="https://github.com/user-attachments/assets/b5d9b774-0695-4cf9-912c-c93e052701ca" alt="Project Image 1" style="width:100%;"></td>
   </tr>
 </table>
 
